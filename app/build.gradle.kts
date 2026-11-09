@@ -8,11 +8,11 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "dev.busung.s25uroot"
+        applicationId = "dev.koto.kotoroot"
         minSdk = 33
         targetSdk = 36
-        versionCode = 13
-        versionName = "0.2.65"
+        versionCode = 1
+        versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {

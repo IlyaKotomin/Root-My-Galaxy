@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 3,
+  "payloads": [
+    {
+      "payloadId": "galaxy-s25-series-2026-06-07",
+      "displayName": "Galaxy S25 \u2022 Offline kit",
+      "models": [
+        "SM-S931B"
+      ],
+      "kernelVersions": [
+        "6.6.98"
+      ],
+      "exploit": {
+        "url": "payload.so",
+        "size": 104128,
+        "sha256": "6311e5ae1a381fd96b8a989e82525521ed9b00cff4e0d3020d3904eb5716587c"
+      },
+      "kernelsu": {
+        "url": "ksud",
+        "size": 6407096,
+        "sha256": "fa3edcc7d168637394877b30cb1f909d762dda788ec14051f4ae79edd6562d63"
+      }
+    }
+  ],
+  "sourceCommit": "6e3223e689688540060ddd97a0927e927bfed207",
+  "manager": {
+    "file": "KernelSU_v3.2.5_32525-release.apk",
+    "sha256": "1417081413bf7ab1de8e440ecbcb62685037c8f28f048f0f8b79e305b31ab916"
+  }
+}

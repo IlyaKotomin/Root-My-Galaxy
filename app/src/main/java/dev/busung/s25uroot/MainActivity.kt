@@ -168,6 +168,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppPreferences.applyKotoDefaults(this)
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
         accentColor = AppPreferences.accentColor(this)
@@ -332,7 +333,7 @@ private fun RootApp(
             }
         }
     }
-    LaunchedEffect(Unit) { checkForUpdate() }
+    // Offline first: check for app updates only when explicitly requested.
 
     if (showTargetPicker) {
         TargetSelectionSheet(
@@ -565,27 +566,33 @@ private fun OverviewPage(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 54.dp, bottom = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_app_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                )
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                AppVersionText(
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
-                )
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Icon(painterResource(R.drawable.ic_app_logo), null, Modifier.size(42.dp), tint = MaterialTheme.colorScheme.primary)
+                    Column {
+                        Text("KotoRoot", style = MaterialTheme.typography.headlineLarge)
+                        Text("YOUR GALAXY. YOUR CONTROL.", style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary)
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Text("v0.1", style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.outline)
+                }
+            }
+        }
+        item {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Rounded.VerifiedUser, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                        Text("OFFLINE KIT INCLUDED", style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary)
+                    }
+                    Text("Galaxy S25", style = MaterialTheme.typography.headlineSmall)
+                    Text("SM-S931B  ·  Kernel 6.6.98", style = MaterialTheme.typography.bodyMedium)
+                    Text("Everything you need is on this device. Root is temporary and ends after a reboot.",
+                        style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
         if (
@@ -765,10 +772,19 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                     if (managerInstalled) {
                         openKernelSuManager(context)
                     } else {
-                        uriHandler.openUri(KERNEL_SU_MANAGER_URL)
+                        runCatching {
+                            val apk = java.io.File(context.cacheDir, "updates/KernelSU.apk")
+                            apk.parentFile?.mkdirs()
+                            context.assets.open("offline/KernelSU_v3.2.5_32525-release.apk").use { input ->
+                                apk.outputStream().use { input.copyTo(it) }
+                            }
+                            check(AppUpdater.installApk(context, apk))
+                        }.onFailure {
+                            Toast.makeText(context, "Unable to open bundled KernelSU installer", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
-                else -> onInstall()
+                installState.phase == InstallPhase.Ready || installState.phase == InstallPhase.Failed -> onInstall()
             }
         },
         modifier = Modifier.fillMaxWidth().animateContentSize(),
@@ -796,7 +812,7 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                     Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
                 )
                 else -> Icon(
-                    Icons.Rounded.Warning, contentDescription = null, modifier = Modifier.size(44.dp),
+                    Icons.Rounded.Security, contentDescription = null, modifier = Modifier.size(44.dp),
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
@@ -822,7 +838,7 @@ private fun InstallStatusCard(installState: InstallUiState, onInstall: () -> Uni
                             InstallPhase.Ready -> stringResource(R.string.status_not_installed)
                             else -> installState.message
                         },
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                 }
                 Text(

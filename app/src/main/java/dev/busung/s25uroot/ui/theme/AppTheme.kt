@@ -24,7 +24,7 @@ import dev.busung.s25uroot.AccentColor
 import dev.busung.s25uroot.AppThemeMode
 
 private val AppTypography = Typography(
-    displaySmall = TextStyle(fontSize = 38.sp, lineHeight = 44.sp, fontWeight = FontWeight.Light),
+    displaySmall = TextStyle(fontSize = 38.sp, lineHeight = 44.sp, fontWeight = FontWeight.Bold),
     headlineLarge = TextStyle(fontSize = 32.sp, lineHeight = 38.sp, fontWeight = FontWeight.Normal),
     headlineSmall = TextStyle(fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.Normal),
     titleLarge = TextStyle(fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium),
@@ -41,7 +41,7 @@ private fun accentSeed(context: Context, accentColor: AccentColor): Color = when
     AccentColor.Dynamic -> Color(context.getColor(android.R.color.system_accent1_500))
     AccentColor.Blue -> Color(0xFF415F91)
     AccentColor.Violet -> Color(0xFF6750A4)
-    AccentColor.Green -> Color(0xFF356A35)
+    AccentColor.Green -> Color(0xFF58DBC2)
     AccentColor.Orange -> Color(0xFF8B4F23)
 }
 

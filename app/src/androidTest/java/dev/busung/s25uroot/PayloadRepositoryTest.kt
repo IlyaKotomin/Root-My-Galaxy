@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class PayloadRepositoryTest {
     @Test
-    fun manifestMatchesDeviceAndArtifactsDownload() {
+    fun bundledKitPreparesWithoutNetworkAndRepairsCorruptCache() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val repository = PayloadRepository(context)
         val snapshot = DeviceSnapshot.current()
@@ -22,5 +22,14 @@ class PayloadRepositoryTest {
         assertEquals(profile.kernelSu.size, payloads.kernelSu.length())
         assertTrue(payloads.exploit.canRead())
         assertTrue(payloads.kernelSu.canRead())
+
+        val expected = payloads.exploit.readBytes()
+        android.system.Os.chmod(payloads.exploit.absolutePath, 0b110000000)
+        // Same-size damage must be detected by SHA-256, not just a length check.
+        val damaged = expected.copyOf()
+        damaged[0] = (damaged[0].toInt() xor 1).toByte()
+        payloads.exploit.writeBytes(damaged)
+        val repaired = repository.download(profile) { }
+        org.junit.Assert.assertArrayEquals(expected, repaired.exploit.readBytes())
     }
 }

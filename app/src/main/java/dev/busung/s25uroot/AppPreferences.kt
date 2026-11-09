@@ -36,8 +36,15 @@ object AppPreferences {
     private const val SHIZUKU_MODE = "shizuku_mode"
     private const val CONSUMED_INSTALL_REQUEST = "consumed_install_request"
 
+    fun applyKotoDefaults(context: Context) {
+        if (!prefs(context).getBoolean("koto_defaults_applied", false)) {
+            setLanguage(context, "en")
+            prefs(context).edit().putBoolean("koto_defaults_applied", true).apply()
+        }
+    }
+
     fun accentColor(context: Context): AccentColor = AccentColor.fromStoredValue(
-        prefs(context).getString(ACCENT_COLOR, null),
+        prefs(context).getString(ACCENT_COLOR, "green"),
     )
 
     fun setAccentColor(context: Context, color: AccentColor) {
@@ -47,7 +54,7 @@ object AppPreferences {
     }
 
     fun themeMode(context: Context): AppThemeMode = AppThemeMode.fromStoredValue(
-        prefs(context).getString(THEME_MODE, null),
+        prefs(context).getString(THEME_MODE, "dark"),
     )
 
     fun setThemeMode(context: Context, themeMode: AppThemeMode) {
